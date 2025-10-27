@@ -1,0 +1,10 @@
+ARG from
+FROM $from
+
+COPY etc/ /etc/
+
+RUN dnf -y install \
+    sway \
+    regreet \
+    regreet-config-sway \
+    waybar
