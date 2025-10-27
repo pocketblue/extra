@@ -1,0 +1,10 @@
+ARG from
+FROM $from
+
+COPY etc/ /etc/
+
+RUN dnf -y install \
+    hyprland \
+    regreet \
+    regreet-config-hyprland \
+    waybar
