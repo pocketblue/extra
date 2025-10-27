@@ -8,3 +8,5 @@ RUN dnf -y install \
     regreet \
     regreet-config-niri \
     waybar
+
+RUN systemctl enable greetd.service

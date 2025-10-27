@@ -8,3 +8,5 @@ RUN dnf -y install \
     regreet \
     regreet-config-sway \
     waybar
+
+RUN systemctl enable greetd.service
