@@ -8,6 +8,7 @@ RUN dnf -y install \
     regreet \
     regreet-config-niri \
     waybar \
+    brightnessctl \
     flatpak \
     libwayland-server
 

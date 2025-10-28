@@ -8,6 +8,7 @@ RUN dnf -y install \
     regreet \
     regreet-config-sway \
     waybar \
+    brightnessctl \
     flatpak
 
 RUN systemctl enable greetd.service
