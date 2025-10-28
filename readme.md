@@ -1,6 +1,6 @@
 # pocketblue extra
 
-- this repo provides some extra images with different wayland compositor for pocketblue
+- this repo provides some extra images with different wayland compositors for pocketblue
 - you should already have pocketblue installed on your device to try any of this images
 - before switching you should run `rpm-ostree reset`
 
