@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
-        desktop: [niri, sway, hyprland]
+        desktop: [niri, sway, hyprland, cosmic]
     uses: pocketblue/pocketblue/.github/workflows/helper-build-container.yml@main
     with:
       from_registry: quay.io/pocketblue

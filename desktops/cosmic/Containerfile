@@ -1,0 +1,11 @@
+ARG from
+FROM $from
+
+RUN dnf -y install \
+    @cosmic-desktop \
+    --exclude PackageKit \
+    --exclude PackageKit-command-not-found
+
+RUN systemctl enable \
+    cosmic-greeter-daemon.service \
+    cosmic-greeter.service

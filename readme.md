@@ -9,21 +9,25 @@
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-nabu-niri:43`
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-nabu-sway:43`
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-nabu-hyprland:43`
+- `sudo bootc switch quay.io/pocketblue-extra/xiaomi-nabu-cosmic:43`
 
 ### xiaomi pad 6
 
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-pipa-niri:43`
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-pipa-sway:43`
 - `sudo bootc switch quay.io/pocketblue-extra/xiaomi-pipa-hyprland:43`
+- `sudo bootc switch quay.io/pocketblue-extra/xiaomi-pipa-cosmic:43`
 
 ### oneplus 6/6t
 
 - `sudo bootc switch quay.io/pocketblue-extra/oneplus-sdm845-niri:43`
 - `sudo bootc switch quay.io/pocketblue-extra/oneplus-sdm845-sway:43`
 - `sudo bootc switch quay.io/pocketblue-extra/oneplus-sdm845-hyprland:43`
+- `sudo bootc switch quay.io/pocketblue-extra/oneplus-sdm845-cosmic:43`
 
 ### nothing phone 1
 
 - `sudo bootc switch quay.io/pocketblue-extra/nothing-spacewar-niri:43`
 - `sudo bootc switch quay.io/pocketblue-extra/nothing-spacewar-sway:43`
 - `sudo bootc switch quay.io/pocketblue-extra/nothing-spacewar-hyprland:43`
+- `sudo bootc switch quay.io/pocketblue-extra/nothing-spacewar-cosmic:43`
