@@ -34,8 +34,11 @@ jobs:
         desktop: [niri, sway, hyprland]
     uses: pocketblue/pocketblue/.github/workflows/helper-build-container.yml@main
     with:
+      from_registry: quay.io/pocketblue
+      from_image: ${{ matrix.device }}-base
       from_tag: ${{ inputs.fedora_branch || 42 }}
-      from_image: quay.io/pocketblue/${{ matrix.device }}-base
+      target_registry: ${{ vars.REGISTRY }}
       target_image: ${{ matrix.device }}-${{ matrix.desktop }}
+      target_tag: ${{ inputs.fedora_branch || 42 }}
       context: desktops/${{ matrix.desktop }}
       rechunk: true
