@@ -30,8 +30,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
-        desktop: [niri, sway, hyprland, cosmic]
+        device: [nothing-spacewar, oneplus-sdm845, xiaomi-nabu, xiaomi-pipa]
+        desktop:
+          - name: cosmic
+            base: "quay.io/fedora-ostree-desktops/cosmic-atomic"
+          - name: hyprland
+            base: "quay.io/fedora-ostree-desktops/base-atomic"
+          - name: niri
+            base: "quay.io/fedora-ostree-desktops/base-atomic"
+          - name: sway
+            base: "quay.io/fedora-ostree-desktops/sway-atomic"
     steps:
       - name: Checkout pocketblue repo
         uses: actions/checkout@v4
@@ -53,9 +61,10 @@ jobs:
         id: build
         run: |
           just \
+            base_atomic=${{ matrix.desktop.base }} \
             branch=${{ inputs.fedora_branch || 42 }} \
             device=${{ matrix.device }} \
-            desktop=${{ matrix.desktop }} \
+            desktop=${{ matrix.desktop.name }} \
             registry=${{ vars.REGISTRY }} \
             rechunk_suffix=-build \
             build
@@ -64,9 +73,10 @@ jobs:
         id: rechunk
         run: |
           just \
+            base_atomic=${{ matrix.desktop.base }} \
             branch=${{ inputs.fedora_branch || 42 }} \
             device=${{ matrix.device }} \
-            desktop=${{ matrix.desktop }} \
+            desktop=${{ matrix.desktop.name }} \
             registry=${{ vars.REGISTRY }} \
             rechunk_suffix=-build \
             rechunk
@@ -78,5 +88,5 @@ jobs:
           username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
           registry: ${{ vars.REGISTRY }}
-          name: ${{ matrix.device }}-${{ matrix.desktop }}
+          name: ${{ matrix.device }}-${{ matrix.desktop.name }}
           tag: ${{ inputs.fedora_branch || 42 }}
