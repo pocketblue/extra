@@ -42,12 +42,12 @@ jobs:
             base: "quay.io/fedora-ostree-desktops/sway-atomic"
     steps:
       - name: Checkout pocketblue repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: pocketblue/pocketblue
 
       - name: Checkout extra repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: extra
 
