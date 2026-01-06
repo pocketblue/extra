@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT etc /etc
+
+dnf -y install \
+    niri \
+    regreet \
+    regreet-config-niri \
+    waybar \
+    brightnessctl \
+    flatpak \
+    libwayland-server
+
+systemctl enable greetd.service

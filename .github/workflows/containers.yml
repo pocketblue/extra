@@ -24,21 +24,59 @@ run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event
 
 jobs:
   desktops:
+    runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
-    secrets: inherit
     strategy:
       fail-fast: false
       matrix:
         device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
         desktop: [niri, sway, hyprland, cosmic]
-    uses: pocketblue/pocketblue/.github/workflows/helper-build-container.yml@main
-    with:
-      from_registry: quay.io/pocketblue
-      from_image: ${{ matrix.device }}-base
-      from_tag: ${{ inputs.fedora_branch || 42 }}
-      target_registry: ${{ vars.REGISTRY }}
-      target_image: ${{ matrix.device }}-${{ matrix.desktop }}
-      target_tag: ${{ inputs.fedora_branch || 42 }}
-      context: desktops/${{ matrix.desktop }}
-      rechunk: true
+    steps:
+      - name: Checkout pocketblue repo
+        uses: actions/checkout@v4
+        with:
+          repository: pocketblue/pocketblue
+
+      - name: Checkout extra repo
+        uses: actions/checkout@v4
+        with:
+          path: extra
+
+      - name: Merge desktops
+        run: cp -arT extra/desktops desktops
+
+      - name: Setup just
+        uses: extractions/setup-just@v3
+
+      - name: Build
+        id: build
+        run: |
+          just \
+            branch=${{ inputs.fedora_branch || 42 }} \
+            device=${{ matrix.device }} \
+            desktop=${{ matrix.desktop }} \
+            registry=${{ vars.REGISTRY }} \
+            rechunk_suffix=-build \
+            build
+
+      - name: Rechunk
+        id: rechunk
+        run: |
+          just \
+            branch=${{ inputs.fedora_branch || 42 }} \
+            device=${{ matrix.device }} \
+            desktop=${{ matrix.desktop }} \
+            registry=${{ vars.REGISTRY }} \
+            rechunk_suffix=-build \
+            rechunk
+
+      - name: Push
+        id: push
+        uses: pocketblue/actions/container-push@main
+        env:
+          username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
+          password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+          registry: ${{ vars.REGISTRY }}
+          name: ${{ matrix.device }}-${{ matrix.desktop }}
+          tag: ${{ inputs.fedora_branch || 42 }}

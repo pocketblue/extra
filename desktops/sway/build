@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT etc /etc
+
+dnf -y install \
+    sway \
+    regreet \
+    regreet-config-sway \
+    waybar \
+    brightnessctl \
+    flatpak
+
+systemctl enable greetd.service
