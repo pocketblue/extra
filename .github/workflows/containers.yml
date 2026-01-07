@@ -40,6 +40,15 @@ jobs:
             base: "quay.io/fedora-ostree-desktops/base-atomic"
           - name: sway
             base: "quay.io/fedora-ostree-desktops/sway-atomic"
+    env:
+      JUST_ARGS: >
+        base_atomic=${{ matrix.desktop.base }}
+        branch=${{ inputs.fedora_branch || 43 }}
+        device=${{ matrix.device }}
+        desktop=${{ matrix.desktop.name }}
+        registry=${{ vars.REGISTRY }}
+        rechunk_suffix=-build
+
     steps:
       - name: Checkout pocketblue repo
         uses: actions/checkout@v6
@@ -59,27 +68,11 @@ jobs:
 
       - name: Build
         id: build
-        run: |
-          just \
-            base_atomic=${{ matrix.desktop.base }} \
-            branch=${{ inputs.fedora_branch || 43 }} \
-            device=${{ matrix.device }} \
-            desktop=${{ matrix.desktop.name }} \
-            registry=${{ vars.REGISTRY }} \
-            rechunk_suffix=-build \
-            build
+        run: just $JUST_ARGS build
 
       - name: Rechunk
         id: rechunk
-        run: |
-          just \
-            base_atomic=${{ matrix.desktop.base }} \
-            branch=${{ inputs.fedora_branch || 43 }} \
-            device=${{ matrix.device }} \
-            desktop=${{ matrix.desktop.name }} \
-            registry=${{ vars.REGISTRY }} \
-            rechunk_suffix=-build \
-            rechunk
+        run: just $JUST_ARGS rechunk
 
       - name: Push
         id: push
