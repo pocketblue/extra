@@ -15,12 +15,12 @@ on:
           - '42'
           - '43'
           - 'rawhide'
-        default: '42'
+        default: '43'
   push:
     paths:
       - 'desktops/**'
 
-run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
+run-name: "containers: fedora ${{ inputs.fedora_branch || 43 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
 
 jobs:
   desktops:
@@ -62,7 +62,7 @@ jobs:
         run: |
           just \
             base_atomic=${{ matrix.desktop.base }} \
-            branch=${{ inputs.fedora_branch || 42 }} \
+            branch=${{ inputs.fedora_branch || 43 }} \
             device=${{ matrix.device }} \
             desktop=${{ matrix.desktop.name }} \
             registry=${{ vars.REGISTRY }} \
@@ -74,7 +74,7 @@ jobs:
         run: |
           just \
             base_atomic=${{ matrix.desktop.base }} \
-            branch=${{ inputs.fedora_branch || 42 }} \
+            branch=${{ inputs.fedora_branch || 43 }} \
             device=${{ matrix.device }} \
             desktop=${{ matrix.desktop.name }} \
             registry=${{ vars.REGISTRY }} \
@@ -89,4 +89,4 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
           registry: ${{ vars.REGISTRY }}
           name: ${{ matrix.device }}-${{ matrix.desktop.name }}
-          tag: ${{ inputs.fedora_branch || 42 }}
+          tag: ${{ inputs.fedora_branch || 43 }}
