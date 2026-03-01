@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [nothing-spacewar, oneplus-sdm845, xiaomi-nabu, xiaomi-pipa]
+        device: [nothing-spacewar, qualcomm-sdm845, xiaomi-nabu, xiaomi-pipa]
         desktop:
           - name: cosmic
             base: "quay.io/fedora-ostree-desktops/cosmic-atomic"
@@ -47,7 +47,6 @@ jobs:
         device=${{ matrix.device }}
         desktop=${{ matrix.desktop.name }}
         registry=${{ vars.REGISTRY }}
-        rechunk_suffix=-build
 
     steps:
       - name: Checkout pocketblue repo
