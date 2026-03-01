@@ -2,7 +2,8 @@
 
 This repo provides some extra images with different wayland compositors for Pocketblue.
 To switch to any of these images you should already have Pocketblue installed on your device.
-Before switching, you should run `rpm-ostree reset`.
+
+Before switching, you should run `rpm-ostree reset` (alternatively, use the `sudo rpm-ostree rebase ostree-unverified-registry:<IMAGE>` command)
 
 ### Nothing Phone 1
 
