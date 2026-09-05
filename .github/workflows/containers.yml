@@ -34,8 +34,6 @@ jobs:
         desktop:
           - name: cosmic
             base: "quay.io/fedora-ostree-desktops/cosmic-atomic"
-          - name: hyprland
-            base: "quay.io/fedora-ostree-desktops/base-atomic"
           - name: niri
             base: "quay.io/fedora-ostree-desktops/base-atomic"
           - name: sway
