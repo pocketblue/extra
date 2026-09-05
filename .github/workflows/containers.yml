@@ -12,7 +12,6 @@ on:
         description: 'fedora branch'
         required: true
         options:
-          - '43'
           - '44'
           - 'rawhide'
         default: '44'
