@@ -12,25 +12,25 @@ on:
         description: 'fedora branch'
         required: true
         options:
-          - '42'
           - '43'
+          - '44'
           - 'rawhide'
-        default: '43'
+        default: '44'
   push:
     paths:
       - 'desktops/**'
 
-run-name: "containers: fedora ${{ inputs.fedora_branch || 43 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
+run-name: "containers: fedora ${{ inputs.fedora_branch || 44 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
 
 jobs:
   desktops:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     permissions:
       packages: write
     strategy:
       fail-fast: false
       matrix:
-        device: [nothing-spacewar, qualcomm-sdm845, xiaomi-nabu, xiaomi-pipa]
+        device: [nothing-spacewar, qualcomm-sdm845, xiaomi-nabu, xiaomi-nabu-rodriguezst, xiaomi-pipa]
         desktop:
           - name: cosmic
             base: "quay.io/fedora-ostree-desktops/cosmic-atomic"
@@ -40,13 +40,6 @@ jobs:
             base: "quay.io/fedora-ostree-desktops/base-atomic"
           - name: sway
             base: "quay.io/fedora-ostree-desktops/sway-atomic"
-    env:
-      JUST_ARGS: >
-        base_atomic=${{ matrix.desktop.base }}
-        branch=${{ inputs.fedora_branch || 43 }}
-        device=${{ matrix.device }}
-        desktop=${{ matrix.desktop.name }}
-        registry=${{ vars.REGISTRY }}
 
     steps:
       - name: Checkout pocketblue repo
@@ -62,23 +55,74 @@ jobs:
       - name: Merge desktops
         run: cp -arT extra/desktops desktops
 
+      - name: Get device config
+        id: conf
+        shell: bash
+        run: |
+          cat 'devices/${{ matrix.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
+
+      - name: Prepare environment
+        run: |
+          if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
+            echo "PB_TAG=${{ inputs.fedora_branch || 44 }}" >> .env
+            echo "TARGET_IMAGE_NAME=${{ matrix.device }}-${{ matrix.desktop.name }}" >> $GITHUB_ENV
+          else
+            pb_tag="${{ inputs.fedora_branch || 44 }}-${{ steps.conf.outputs.device_variant }}"
+            target_image_name="${{ steps.conf.outputs.device_base }}-${{ matrix.desktop.name }}"
+
+            echo "PB_TAG=$pb_tag" >> .env
+            echo "PB_FULL_IMAGE=${{ vars.REGISTRY }}/${target_image_name}:${pb_tag}" >> .env
+            echo "TARGET_IMAGE_NAME=$target_image_name" >> $GITHUB_ENV
+          fi
+
+          cat >> .env << EOF
+          PB_BRANCH=${{ inputs.fedora_branch || 44 }}
+          PB_DEVICE=${{ matrix.device }}
+          PB_DESKTOP=${{ matrix.desktop.name }}
+          PB_REGISTRY=${{ vars.REGISTRY }}
+          PB_BASE=${{ matrix.desktop.base }}
+          EOF
+
+          cat .env >> $GITHUB_ENV
+
       - name: Setup just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@v4
+
+      - name: Pull
+        run: sudo --preserve-env=PATH $(which just) pull
 
       - name: Build
-        id: build
-        run: just $JUST_ARGS build
+        run: sudo --preserve-env=PATH $(which just) build
 
       - name: Rechunk
-        id: rechunk
-        run: just $JUST_ARGS rechunk
+        run: sudo --preserve-env=PATH $(which just) rechunk
 
-      - name: Push
-        id: push
-        uses: pocketblue/actions/container-push@main
+      - name: Login to registry
         env:
-          username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
-          password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ vars.REGISTRY }}
-          name: ${{ matrix.device }}-${{ matrix.desktop.name }}
-          tag: ${{ inputs.fedora_branch || 43 }}
+          username: ${{ vars.REGISTRY_USERNAME || github.repository_owner }}
+          password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          sudo podman login --username $username --password $password $PB_REGISTRY
+
+      - name: Push to registry
+        id: push
+        run: |
+          # retry 3 times
+          function push {
+            img=$1
+
+            n=0
+            until [ "$n" -ge 3 ]; do
+              sudo podman push --digestfile=/tmp/digestfile $img && break
+              n=$((n+1))
+              sleep 10
+            done
+
+            if [ "$n" -ge 3 ]; then
+              exit 1
+            fi
+          }
+
+          # HACK: push twice as a workaround to push rechunk annotations
+          push "$PB_REGISTRY/$TARGET_IMAGE_NAME:$PB_TAG"
+          push "$PB_REGISTRY/$TARGET_IMAGE_NAME:$PB_TAG"
